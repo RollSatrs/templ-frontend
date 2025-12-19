@@ -11,26 +11,44 @@ import {
 import { Input } from "@/components/ui/input"
 import { sizes } from "@/const/css"
 import { apiPost } from "@/lib/api"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { ButtonGroup } from "./ui/button-group"
+import { Spinner } from "./ui/spinner"
+import { Role } from "@/interface/role.interface"
 
 export function SignupForm({ className, ...props }: React.ComponentProps<"form">) {
-  const [fullname, setFullName] = useState("")
+  const [fullname, setFullName] = useState("")      
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
-  const [role, setRole] = useState("student") 
+  const [role, setRole] = useState<Role>("student") 
 
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
 
+  useEffect(() => {
+    if (!error) return
+
+    const timer = setTimeout(() => {
+      setError("")
+    }, 3000)
+
+    return () => clearTimeout(timer)
+  }, [error])
+
   const handlerSignup = async (e: React.FormEvent<HTMLFormElement>) => {
+
     e.preventDefault()
-    setError("")
     setLoading(true)
 
     if (password !== confirmPassword) {
-      setError("Пароли не совпадают")
+      setError("Пароли не совпадают. Пожалуйста, проверьте ввод.")
+      setLoading(false)
+      return
+    }
+
+    if (password.length < 8) {
+      setError("Пароль должен содержать не менее 8 символов.")
       setLoading(false)
       return
     }
@@ -38,11 +56,11 @@ export function SignupForm({ className, ...props }: React.ComponentProps<"form">
     try {
       const response = await apiPost("/auth/register", { fullname, email, password, role })
       alert("Регистрация успешна!")
-      setFullName("")
-      setEmail("")
-      setPassword("")
-      setConfirmPassword("")
-      setRole("student")
+      // setFullName("")
+      // setEmail("")
+      // setPassword("")
+      // setConfirmPassword("")
+      // setRole("student")
     } catch (err: any) {
       console.error(err)
       setError(err.response?.data?.message || "Ошибка регистрации")
@@ -56,7 +74,7 @@ export function SignupForm({ className, ...props }: React.ComponentProps<"form">
       <FieldGroup>
         <div className="flex flex-col items-center gap-1 text-center">
           <h1 className="text-2xl font-bold">Создать аккаунт</h1>
-          <p className={sizes.small}>
+          <p className={sizes.minitwo}>
             Заполните форму ниже, чтобы создать аккаунт
           </p>
         </div>
@@ -70,8 +88,8 @@ export function SignupForm({ className, ...props }: React.ComponentProps<"form">
                 Студент
             </Button>
             <Button
-              onClick={() =>setRole("schoolchildren")} 
-              variant={role === "schoolchildren" ? "default" : "outline"}
+              onClick={() =>setRole("schoolkid")} 
+              variant={role === "schoolkid" ? "default" : "outline"}
               type="button" 
             >
               Школьник
@@ -133,36 +151,37 @@ export function SignupForm({ className, ...props }: React.ComponentProps<"form">
           </FieldDescription>
         </Field>
 
-        <Field>
-          <FieldLabel htmlFor="role">Роль</FieldLabel>
-          <select
-            id="role"
-            value={role}
-            onChange={(e) => setRole(e.target.value)}
-            className="border border-gray-300 rounded p-2"
+        <div
+          className={cn(
+            "overflow-hidden transition-all duration-300 ease-in-out",
+            error ? "max-h-16 opacity-100 mt-1" : "max-h-0 opacity-0 mt-0"
+          )}
+        >
+          <div
+            className={cn(
+              "flex items-center gap-2 rounded-md border border-red-200 bg-red-50 px-2 py-1 text-xs text-red-700",
+              error && "animate-shake"
+            )}
           >
-            <option value="teacher">Учитель</option>
-            <option value="student">Студент</option>
-            <option value="schoolkid">Школьник</option>
-          </select>
-          <FieldDescription className={sizes.mini}>
-            Выберите вашу роль.
-          </FieldDescription>
-        </Field>
-
-        {error && <p className="text-red-500 text-sm">{error}</p>}
+            <span className="leading-none">⚠️</span>
+            <span className="leading-tight">{error}</span>
+          </div>
+        </div>
 
         <Field>
           <Button type="submit" disabled={loading}>
             {loading ? "Регистрация..." : "Создать аккаунт"}
+            {loading? <Spinner className="size-6" />: ""}
           </Button>
-        </Field>
-
-        <Field>
           <FieldDescription className="px-6 text-center">
             Уже есть аккаунт? <a href="login">Войти</a>
           </FieldDescription>
         </Field>
+
+
+
+        
+        
       </FieldGroup>
     </form>
   )
