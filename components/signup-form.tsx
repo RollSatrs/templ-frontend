@@ -1,6 +1,6 @@
 "use client"
 
-import { cn } from "@/lib/utils"
+import { cn } from "@/shared/lib/utils"
 import { Button,  } from "@/components/ui/button"
 import {
   Field,
@@ -9,19 +9,19 @@ import {
   FieldLabel,
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-import { sizes } from "@/const/css"
-import { apiPost } from "@/lib/api"
+import { sizes } from "@/shared/constants/css"
+import { apiPost } from "@/shared/lib/api"
 import { useEffect, useState } from "react"
 import { ButtonGroup } from "./ui/button-group"
 import { Spinner } from "./ui/spinner"
-import { Role } from "@/interface/role.interface"
+import { Role } from "@/shared/interface/role.interface"
 
 export function SignupForm({ className, ...props }: React.ComponentProps<"form">) {
-  const [fullname, setFullName] = useState("")      
+  const [fullname, setFullName] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
-  const [role, setRole] = useState<Role>("student") 
+  const [role, setRole] = useState<Role>("student")
 
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
@@ -63,7 +63,7 @@ export function SignupForm({ className, ...props }: React.ComponentProps<"form">
       // setRole("student")
     } catch (err: any) {
       console.error(err)
-      setError(err.response?.data?.message || "Ошибка регистрации")
+      setError(err.response?.data?.message)
     } finally {
       setLoading(false)
     }
@@ -80,17 +80,17 @@ export function SignupForm({ className, ...props }: React.ComponentProps<"form">
         </div>
         <div className="flex justify-center">
           <ButtonGroup >
-            <Button 
-              onClick={() =>setRole("student")} 
+            <Button
+              onClick={() =>setRole("student")}
               variant={role === "student" ? "default" : "outline"}
               type="button"
             >
                 Студент
             </Button>
             <Button
-              onClick={() =>setRole("schoolkid")} 
+              onClick={() =>setRole("schoolkid")}
               variant={role === "schoolkid" ? "default" : "outline"}
-              type="button" 
+              type="button"
             >
               Школьник
             </Button>
@@ -180,8 +180,8 @@ export function SignupForm({ className, ...props }: React.ComponentProps<"form">
 
 
 
-        
-        
+
+
       </FieldGroup>
     </form>
   )
