@@ -1,4 +1,6 @@
-import { cn } from "@/shared/lib/utils"
+"use client"
+
+import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import {
   Field,
@@ -8,13 +10,60 @@ import {
   FieldSeparator,
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
+import { useEffect, useState } from "react"
+import { api, apiPost } from "@/lib/api"
+import { Spinner } from "./ui/spinner"
+import { useRouter } from "next/navigation"
 
 export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"form">) {
+
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState("")
+  const router = useRouter()
+
+  useEffect(() => {
+    if (!error) return
+    const timer = setTimeout(() => {
+      setError("")
+    }, 3000)
+    return () => clearTimeout(timer)
+  }, [error])
+
+  const handlerLogin = async (e: React.FormEvent<HTMLFormElement>) => {
+
+    e.preventDefault()
+    setLoading(true)
+
+
+    if (password.length < 8) {
+      setError("Пароль должен содержать не менее 8 символов.")
+      setLoading(false)
+      return
+    }
+
+    try {
+      await api.post("/auth/login", { email, password })
+      router.push("/")
+      // setFullName("")
+      // setEmail("")
+      // setPassword("")
+      // setConfirmPassword("")
+      // setRole("student")
+    } catch (err: any) {
+      console.error(err)
+      setError(err.response?.data?.message)
+    } finally {
+      setLoading(false)
+    }
+  }
+
   return (
-    <form className={cn("flex flex-col gap-6", className)} {...props}>
+    <form onSubmit={handlerLogin} className={cn("flex flex-col gap-6", className)} {...props}>
       <FieldGroup>
         <div className="flex flex-col items-center gap-1 text-center">
           <h1 className="text-2xl font-bold">Вход в аккаунт</h1>
@@ -24,7 +73,13 @@ export function LoginForm({
         </div>
         <Field>
           <FieldLabel htmlFor="email">Email</FieldLabel>
-          <Input id="email" type="email" placeholder="m@example.com" required />
+          <Input
+            id="email"
+            type="email"
+            placeholder="m@example.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required />
         </Field>
         <Field>
           <div className="flex items-center">
@@ -36,10 +91,36 @@ export function LoginForm({
               Забыли пароль?
             </a>
           </div>
-          <Input id="password" type="password" required />
+          <Input
+            id="password"
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required />
         </Field>
+
+        <div
+          className={cn(
+            "overflow-hidden transition-all duration-300 ease-in-out",
+            error ? "max-h-16 opacity-100 mt-1" : "max-h-0 opacity-0 mt-0"
+          )}
+        >
+          <div
+            className={cn(
+              "flex items-center gap-2 rounded-md border border-red-200 bg-red-50 px-2 py-1 text-xs text-red-700",
+              error && "animate-shake"
+            )}
+          >
+            <span className="leading-none">⚠️</span>
+            <span className="leading-tight">{error}</span>
+          </div>
+        </div>
+
         <Field>
-          <Button type="submit">Войти</Button>
+          <Button type="submit">
+            {loading ? "Вход..." : "Войти"}
+            {loading ? <Spinner className="size-6" /> : ""}
+          </Button>
         </Field>
         {/* <FieldSeparator>Или продолжить с помощью</FieldSeparator> */}
         <Field>

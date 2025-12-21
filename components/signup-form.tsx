@@ -1,6 +1,6 @@
 "use client"
 
-import { cn } from "@/shared/lib/utils"
+import { cn } from "@/lib/utils"
 import { Button,  } from "@/components/ui/button"
 import {
   Field,
@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { sizes } from "@/shared/constants/css"
-import { apiPost } from "@/shared/lib/api"
+import { api, apiPost } from "@/lib/api"
 import { useEffect, useState } from "react"
 import { ButtonGroup } from "./ui/button-group"
 import { Spinner } from "./ui/spinner"
@@ -54,7 +54,7 @@ export function SignupForm({ className, ...props }: React.ComponentProps<"form">
     }
 
     try {
-      const response = await apiPost("/auth/register", { fullname, email, password, role })
+      await api.post("/auth/register", { fullname, email, password, role })
       alert("Регистрация успешна!")
       // setFullName("")
       // setEmail("")
@@ -177,11 +177,6 @@ export function SignupForm({ className, ...props }: React.ComponentProps<"form">
             Уже есть аккаунт? <a href="login">Войти</a>
           </FieldDescription>
         </Field>
-
-
-
-
-
       </FieldGroup>
     </form>
   )

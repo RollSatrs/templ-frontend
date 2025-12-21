@@ -10,3 +10,7 @@ export function apiPost(path: string, data: any) {
 export function apiGet(path: string, params?: any) {
   return axios.get(`${API_URL}${path}`, { params });
 }
+export const api = axios.create({
+  baseURL: API_URL,
+  withCredentials: true
+})
