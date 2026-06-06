@@ -9,7 +9,8 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401 && typeof window !== "undefined") {
-      window.location.href = "/login"
+      const isAuthRoute = ["/login", "/signup"].some((r) => window.location.pathname.startsWith(r))
+      if (!isAuthRoute) window.location.href = "/login"
     }
     return Promise.reject(error)
   }
