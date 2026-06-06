@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { useEffect, useState } from "react"
-import { api, apiPost } from "@/lib/api"
+import { api } from "@/lib/api"
 import { Spinner } from "./ui/spinner"
 import { useRouter } from "next/navigation"
 
@@ -30,7 +30,7 @@ export function LoginForm({
     if (!error) return
     const timer = setTimeout(() => {
       setError("")
-    }, 3000)
+    }, 2000)
     return () => clearTimeout(timer)
   }, [error])
 
@@ -49,11 +49,6 @@ export function LoginForm({
     try {
       await api.post("/auth/login", { email, password })
       router.push("/")
-      // setFullName("")
-      // setEmail("")
-      // setPassword("")
-      // setConfirmPassword("")
-      // setRole("student")
     } catch (err: any) {
       console.error(err)
       setError(err.response?.data?.message)
@@ -85,7 +80,7 @@ export function LoginForm({
           <div className="flex items-center">
             <FieldLabel htmlFor="password">Пароль</FieldLabel>
             <a
-              href="#"
+              href="/forgot-password"
               className="ml-auto text-sm underline-offset-4 hover:underline"
             >
               Забыли пароль?

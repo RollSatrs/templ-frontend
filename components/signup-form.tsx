@@ -10,8 +10,9 @@ import {
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { sizes } from "@/shared/constants/css"
-import { api, apiPost } from "@/lib/api"
+import { api } from "@/lib/api"
 import { useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
 import { ButtonGroup } from "./ui/button-group"
 import { Spinner } from "./ui/spinner"
 import { Role } from "@/shared/interface/role.interface"
@@ -25,6 +26,7 @@ export function SignupForm({ className, ...props }: React.ComponentProps<"form">
 
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
+  const router = useRouter()
 
   useEffect(() => {
     if (!error) return
@@ -55,7 +57,7 @@ export function SignupForm({ className, ...props }: React.ComponentProps<"form">
 
     try {
       await api.post("/auth/register", { fullname, email, password, role })
-      alert("Регистрация успешна!")
+      router.push("/login")
       // setFullName("")
       // setEmail("")
       // setPassword("")
