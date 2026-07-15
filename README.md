@@ -1,36 +1,81 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Frontend Template
 
-## Getting Started
+Стартовый шаблон фронтенда на [Next.js](https://nextjs.org) (App Router) с готовой авторизацией,
+дашборд-разметкой на [shadcn/ui](https://ui.shadcn.com) и таблицами/графиками. Используется как
+база для новых проектов.
 
-First, run the development server:
+## Стек
+
+- **Next.js 16** (App Router) + **React 19**
+- **Tailwind CSS 4** + **shadcn/ui** (Radix UI) — компоненты в `components/ui`
+- **axios** — HTTP-клиент с автоматическим редиректом на `/login` при 401
+- **zod** — валидация форм и переменных окружения
+- **@tanstack/react-table**, **recharts**, **@dnd-kit** — таблицы, графики, drag-and-drop
+- Middleware, защищающий приватные роуты по наличию cookie `access_token`
+
+## Быстрый старт
+
+### 1. Переменные окружения
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+cp .env.example .env.local
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+| Переменная             | Описание                                  |
+| ----------------------- | ------------------------------------------ |
+| `NEXT_PUBLIC_API_URL`  | URL бэкенда (например, `http://localhost:3001`) |
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Переменные валидируются в `lib/env.ts` — при отсутствии обязательных значений приложение
+упадёт с понятной ошибкой вместо тихого `undefined`.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 2. Установка и запуск (локально)
 
-## Learn More
+```bash
+pnpm install
+pnpm dev
+```
 
-To learn more about Next.js, take a look at the following resources:
+Откройте [http://localhost:3000](http://localhost:3000).
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### 3. Запуск через Docker
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+docker compose up --build
+```
 
-## Deploy on Vercel
+## Скрипты
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+| Команда        | Назначение                          |
+| -------------- | ------------------------------------- |
+| `pnpm dev`     | Запуск дев-сервера                    |
+| `pnpm build`   | Продакшн-сборка                       |
+| `pnpm start`   | Запуск собранного приложения          |
+| `pnpm lint`    | ESLint                                |
+| `pnpm format`  | Форматирование Prettier               |
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Структура проекта
+
+```
+app/            # роуты App Router (login, signup, forgot/reset-password, дашборд)
+components/     # переиспользуемые компоненты, components/ui — примитивы shadcn
+hooks/          # кастомные React-хуки
+lib/            # axios-клиент (api.ts), валидация env (env.ts), утилиты
+shared/         # константы/типы, общие для нескольких модулей
+middleware.ts   # защита приватных роутов по cookie access_token
+```
+
+## Аутентификация
+
+Бэкенд выставляет JWT в httpOnly-cookie `access_token`. `middleware.ts` проверяет её наличие
+для маршрутизации (пускает на публичные страницы `/login`, `/signup`, `/forgot-password`,
+`/reset-password` без токена и наоборот). Сама валидность токена проверяется на бэкенде;
+`lib/api.ts` перехватывает 401-ответы и редиректит на `/login`.
+
+## CI/CD
+
+В `.github/workflows/ci.yml` настроен пайплайн: установка зависимостей → lint → build,
+запускается на push/PR в `main`.
+
+## Лицензия
+
+Приватный шаблон, см. [LICENSE](./LICENSE).

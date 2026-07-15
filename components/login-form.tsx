@@ -12,6 +12,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { useEffect, useState } from "react"
 import { api } from "@/lib/api"
+import { getErrorMessage } from "@/lib/get-error-message"
 import { Spinner } from "./ui/spinner"
 import { useRouter } from "next/navigation"
 
@@ -19,7 +20,6 @@ export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"form">) {
-
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [loading, setLoading] = useState(false)
@@ -35,10 +35,8 @@ export function LoginForm({
   }, [error])
 
   const handlerLogin = async (e: React.FormEvent<HTMLFormElement>) => {
-
     e.preventDefault()
     setLoading(true)
-
 
     if (password.length < 8) {
       setError("Пароль должен содержать не менее 8 символов.")
@@ -49,16 +47,20 @@ export function LoginForm({
     try {
       await api.post("/auth/login", { email, password })
       router.push("/")
-    } catch (err: any) {
+    } catch (err) {
       console.error(err)
-      setError(err.response?.data?.message)
+      setError(getErrorMessage(err))
     } finally {
       setLoading(false)
     }
   }
 
   return (
-    <form onSubmit={handlerLogin} className={cn("flex flex-col gap-6", className)} {...props}>
+    <form
+      onSubmit={handlerLogin}
+      className={cn("flex flex-col gap-6", className)}
+      {...props}
+    >
       <FieldGroup>
         <div className="flex flex-col items-center gap-1 text-center">
           <h1 className="text-2xl font-bold">Вход в аккаунт</h1>
@@ -74,7 +76,8 @@ export function LoginForm({
             placeholder="m@example.com"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            required />
+            required
+          />
         </Field>
         <Field>
           <div className="flex items-center">
@@ -91,7 +94,8 @@ export function LoginForm({
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            required />
+            required
+          />
         </Field>
 
         <div

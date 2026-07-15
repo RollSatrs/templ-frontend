@@ -1,7 +1,7 @@
 "use client"
 
 import { cn } from "@/lib/utils"
-import { Button,  } from "@/components/ui/button"
+import { Button } from "@/components/ui/button"
 import {
   Field,
   FieldDescription,
@@ -11,13 +11,17 @@ import {
 import { Input } from "@/components/ui/input"
 import { sizes } from "@/shared/constants/css"
 import { api } from "@/lib/api"
+import { getErrorMessage } from "@/lib/get-error-message"
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { ButtonGroup } from "./ui/button-group"
 import { Spinner } from "./ui/spinner"
 import { Role } from "@/shared/interface/role.interface"
 
-export function SignupForm({ className, ...props }: React.ComponentProps<"form">) {
+export function SignupForm({
+  className,
+  ...props
+}: React.ComponentProps<"form">) {
   const [fullname, setFullName] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
@@ -39,7 +43,6 @@ export function SignupForm({ className, ...props }: React.ComponentProps<"form">
   }, [error])
 
   const handlerSignup = async (e: React.FormEvent<HTMLFormElement>) => {
-
     e.preventDefault()
     setLoading(true)
 
@@ -63,16 +66,20 @@ export function SignupForm({ className, ...props }: React.ComponentProps<"form">
       // setPassword("")
       // setConfirmPassword("")
       // setRole("student")
-    } catch (err: any) {
+    } catch (err) {
       console.error(err)
-      setError(err.response?.data?.message)
+      setError(getErrorMessage(err))
     } finally {
       setLoading(false)
     }
   }
 
   return (
-    <form onSubmit={handlerSignup} className={cn("flex flex-col gap-6", className)} {...props}>
+    <form
+      onSubmit={handlerSignup}
+      className={cn("flex flex-col gap-6", className)}
+      {...props}
+    >
       <FieldGroup>
         <div className="flex flex-col items-center gap-1 text-center">
           <h1 className="text-2xl font-bold">Создать аккаунт</h1>
@@ -81,16 +88,16 @@ export function SignupForm({ className, ...props }: React.ComponentProps<"form">
           </p>
         </div>
         <div className="flex justify-center">
-          <ButtonGroup >
+          <ButtonGroup>
             <Button
-              onClick={() =>setRole("student")}
+              onClick={() => setRole("student")}
               variant={role === "student" ? "default" : "outline"}
               type="button"
             >
-                Студент
+              Студент
             </Button>
             <Button
-              onClick={() =>setRole("schoolkid")}
+              onClick={() => setRole("schoolkid")}
               variant={role === "schoolkid" ? "default" : "outline"}
               type="button"
             >
@@ -121,7 +128,8 @@ export function SignupForm({ className, ...props }: React.ComponentProps<"form">
             required
           />
           <FieldDescription className={sizes.mini}>
-            Мы будем использовать этот email для связи с вами. Ваш email никто не увидит.
+            Мы будем использовать этот email для связи с вами. Ваш email никто
+            не увидит.
           </FieldDescription>
         </Field>
 
@@ -140,7 +148,9 @@ export function SignupForm({ className, ...props }: React.ComponentProps<"form">
         </Field>
 
         <Field>
-          <FieldLabel htmlFor="confirm-password">Подтверждение пароля</FieldLabel>
+          <FieldLabel htmlFor="confirm-password">
+            Подтверждение пароля
+          </FieldLabel>
           <Input
             id="confirm-password"
             type="password"
@@ -173,7 +183,7 @@ export function SignupForm({ className, ...props }: React.ComponentProps<"form">
         <Field>
           <Button type="submit" disabled={loading}>
             {loading ? "Регистрация..." : "Создать аккаунт"}
-            {loading? <Spinner className="size-6" />: ""}
+            {loading ? <Spinner className="size-6" /> : ""}
           </Button>
           <FieldDescription className="px-6 text-center">
             Уже есть аккаунт? <a href="login">Войти</a>

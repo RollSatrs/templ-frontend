@@ -2,11 +2,17 @@
 
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
-import { Field, FieldDescription, FieldGroup, FieldLabel } from "@/components/ui/field"
+import {
+  Field,
+  FieldDescription,
+  FieldGroup,
+  FieldLabel,
+} from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { useEffect, useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { api } from "@/lib/api"
+import { getErrorMessage } from "@/lib/get-error-message"
 import { Spinner } from "./ui/spinner"
 
 export function ResetPasswordForm({
@@ -47,8 +53,8 @@ export function ResetPasswordForm({
       await api.post("/auth/reset-password", { token, password })
       setSuccess(true)
       setTimeout(() => router.push("/login"), 2000)
-    } catch (err: any) {
-      setError(err.response?.data?.message || "Произошла ошибка")
+    } catch (err) {
+      setError(getErrorMessage(err, "Произошла ошибка"))
     } finally {
       setLoading(false)
     }
@@ -67,7 +73,11 @@ export function ResetPasswordForm({
   }
 
   return (
-    <form onSubmit={handleSubmit} className={cn("flex flex-col gap-6", className)} {...props}>
+    <form
+      onSubmit={handleSubmit}
+      className={cn("flex flex-col gap-6", className)}
+      {...props}
+    >
       <FieldGroup>
         <div className="flex flex-col items-center gap-1 text-center">
           <h1 className="text-2xl font-bold">Новый пароль</h1>
