@@ -52,11 +52,16 @@ docker compose up --build
 | `pnpm start`   | Запуск собранного приложения          |
 | `pnpm lint`    | ESLint                                |
 | `pnpm format`  | Форматирование Prettier               |
+| `pnpm test`    | Тесты (Vitest + Testing Library)      |
+| `pnpm test:watch` | Тесты в watch-режиме               |
 
 ## Структура проекта
 
 ```
 app/            # роуты App Router (login, signup, forgot/reset-password, дашборд)
+  error.tsx     # общая страница ошибки рендера
+  not-found.tsx # страница 404
+  loading.tsx   # состояние загрузки
 components/     # переиспользуемые компоненты, components/ui — примитивы shadcn
 hooks/          # кастомные React-хуки
 lib/            # axios-клиент (api.ts), валидация env (env.ts), утилиты
@@ -73,7 +78,7 @@ middleware.ts   # защита приватных роутов по cookie acces
 
 ## CI/CD
 
-В `.github/workflows/ci.yml` настроен пайплайн: установка зависимостей → lint → build,
+В `.github/workflows/ci.yml` настроен пайплайн: установка зависимостей → lint → test → build,
 запускается на push/PR в `main`.
 
 ## Лицензия
